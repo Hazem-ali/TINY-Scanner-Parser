@@ -29,8 +29,8 @@ class Ui_MainWindow(object):
         if self.theme_color == 'Light':
             self.statusBar.setStyleSheet("color : " + color)
         elif self.theme_color == 'Dark':
-            self.statusBar.setStyleSheet("color : white")
-        self.statusBar.showMessage(message)
+            self.statusBar.setStyleSheet("color : cyan")
+        self.statusBar.showMessage(message,4000)
 
     def ErrorDialog(self, error_message):
         msg = QtWidgets.QMessageBox()
@@ -46,7 +46,6 @@ class Ui_MainWindow(object):
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(
             MainWindow, "Open Text file", "", "Text Files (*.txt)", options=options)
         if fileName:
-            print("Opened File:", fileName)
             self.StatusBar_Message("green", "File Opened")
             return fileName
         return
@@ -167,6 +166,10 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.statusBar = QtWidgets.QStatusBar(MainWindow)
         self.statusBar.setObjectName("statusBar")
+        font3 = QtGui.QFont()
+        font3.setBold(True)
+        font3.setWeight(75)
+        self.statusBar.setFont(font3)
         MainWindow.setStatusBar(self.statusBar)
         self.actionOpen_Snippet_File = QtWidgets.QAction(MainWindow)
         self.actionOpen_Snippet_File.setObjectName("actionOpen_Snippet_File")
@@ -215,7 +218,7 @@ class Ui_MainWindow(object):
             _translate("MainWindow", "Scan TINY Code"))
         self.Generate_Syntax_Button.setText(
             _translate("MainWindow", "Generate Syntax Tree"))
-        self.Title.setText(_translate("MainWindow", "TINY Scanner / Parser"))
+        self.Title.setText(_translate("MainWindow", "TINY Compiler"))
         self.Load_Tokens_Button.setText(
             _translate("MainWindow", "Load Tokens"))
         self.menuOpen.setTitle(_translate("MainWindow", "File"))
