@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainParser.ui'
+# Form implementation generated from reading ui file 'MainParserWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
-
+import Parser
 
 class Ui_MainWindow(object):
 
@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
             self.statusBar.setStyleSheet("color : " + color)
         elif self.theme_color == 'Dark':
             self.statusBar.setStyleSheet("color : cyan")
-        self.statusBar.showMessage(message,4000)
+        self.statusBar.showMessage(message, 4000)
 
     def ErrorDialog(self, error_message):
         msg = QtWidgets.QMessageBox()
@@ -67,25 +67,74 @@ class Ui_MainWindow(object):
         if not fileName:
             return
         data = self.Bring_Data_From_File(fileName)
-        self.snippet = data
         self.Snippet_TextBox.setPlainText(data)
-
 
     def Open_Tokens(self):
         fileName = self.OpenFile()
         # make sure it is valid file
         if not fileName:
             return
-        # TODO organize data into list of tuples
-        self.Fill_TextBox(fileName, self.Token_TextBox)
+
+            
+        data = self.Bring_Data_From_File(fileName)
+        
+
+        self.Token_TextBox.setPlainText(data)
+        # print(self.token_tuples)
 
     def Scan_Snippet(self):
         # TODO apply Scanning Algorithm
-        return
+        self.snippet = self.Snippet_TextBox.toPlainText() 
+        if self.snippet == '':
+            self.ErrorDialog("No Snippet Code To Scan!")
+            return
 
+
+        data = self.Token_TextBox.toPlainText()
+        self.Highlight_Text(len(data)-1, 0, self.Token_TextBox)
+        self.StatusBar_Message('green', "Tokens Generated & Highlighted")
+        return
 
     def Parse_Tokens(self):
         # TODO apply Parsing Algorithm
+        token_data = self.Token_TextBox.toPlainText() 
+        if token_data == '':
+            self.ErrorDialog("No Tokens To Parse!")
+            return
+
+        
+        extracted = token_data.split('\n')
+        tokens = []
+        for element in extracted:
+            token = tuple(element.split(','))
+            if('' in token or len(token) != 2):
+                self.ErrorDialog("Incorrect Tokens")
+                return
+            tokens.append(token)
+        
+        self.token_tuples = tokens
+        for i in self.token_tuples:
+            print(i)
+        self.StatusBar_Message('green', "Syntax Tree Generated")
+        return
+
+    def Highlight_Text(self, start, end, textbox):
+        cur_format = QtGui.QTextCharFormat()
+        # color = QtGui.QColor("#6495ED")
+        # cur_format.setBackground(color)
+        # indices = [(200,400),(700,1200),(2000,2500)]
+        cursor = textbox.textCursor()
+        cursor.setPosition(start)
+        cursor.setPosition(end, QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(cur_format)
+        textbox.setTextCursor(cursor)
+
+    def Clear_Highlights(self, textbox):
+        temp = QtWidgets.QPlainTextEdit()
+        cursor = temp.textCursor()
+        cursor.clearSelection()
+        textbox.setTextCursor(cursor)
+        del temp
         return
 
     def setupUi(self, MainWindow):
@@ -116,8 +165,10 @@ class Ui_MainWindow(object):
         font.setStrikeOut(False)
         self.Snippet_TextBox.setFont(font)
         self.Snippet_TextBox.setMouseTracking(False)
+        self.Snippet_TextBox.setTabStopDistance(20)
         self.Snippet_TextBox.setObjectName("Snippet_TextBox")
-        self.Load_Snippet_Button = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.Open_Snippet())
+        self.Load_Snippet_Button = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.Open_Snippet())
         self.Load_Snippet_Button.setGeometry(QtCore.QRect(79, 150, 131, 30))
         self.Load_Snippet_Button.setObjectName("Load_Snippet_Button")
         self.Token_TextBox = QtWidgets.QPlainTextEdit(self.centralwidget)
@@ -130,11 +181,14 @@ class Ui_MainWindow(object):
         font.setStrikeOut(False)
         self.Token_TextBox.setFont(font)
         self.Token_TextBox.setReadOnly(False)
+        self.Token_TextBox.setTabStopDistance(20)
         self.Token_TextBox.setObjectName("Token_TextBox")
-        self.Scan_Tiny_Button = QtWidgets.QPushButton(self.centralwidget)
+        self.Scan_Tiny_Button = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.Scan_Snippet())
         self.Scan_Tiny_Button.setGeometry(QtCore.QRect(219, 150, 121, 30))
         self.Scan_Tiny_Button.setObjectName("Scan_Tiny_Button")
-        self.Generate_Syntax_Button = QtWidgets.QPushButton(self.centralwidget)
+        self.Generate_Syntax_Button = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.Parse_Tokens())
         self.Generate_Syntax_Button.setGeometry(
             QtCore.QRect(569, 150, 161, 30))
         self.Generate_Syntax_Button.setObjectName("Generate_Syntax_Button")
@@ -152,7 +206,8 @@ class Ui_MainWindow(object):
         self.Title.setAutoFillBackground(False)
         self.Title.setAlignment(QtCore.Qt.AlignCenter)
         self.Title.setObjectName("Title")
-        self.Load_Tokens_Button = QtWidgets.QPushButton(self.centralwidget,clicked=lambda: self.Open_Tokens())
+        self.Load_Tokens_Button = QtWidgets.QPushButton(
+            self.centralwidget, clicked=lambda: self.Open_Tokens())
         self.Load_Tokens_Button.setGeometry(QtCore.QRect(459, 150, 101, 30))
         self.Load_Tokens_Button.setObjectName("Load_Tokens_Button")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -173,7 +228,8 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusBar)
         self.actionOpen_Snippet_File = QtWidgets.QAction(MainWindow)
         self.actionOpen_Snippet_File.setObjectName("actionOpen_Snippet_File")
-        self.actionOpen_Snippet_File.triggered.connect(lambda: self.Open_Snippet())
+        self.actionOpen_Snippet_File.triggered.connect(
+            lambda: self.Open_Snippet())
         self.actionSave_As = QtWidgets.QAction(MainWindow)
         self.actionSave_As.setObjectName("actionSave_As")
         self.actionClose = QtWidgets.QAction(MainWindow)
@@ -189,10 +245,11 @@ class Ui_MainWindow(object):
         self.actionDark.setChecked(False)
         self.actionDark.setObjectName("actionDark")
         self.actionDark.triggered.connect(lambda: self.GUI_Color("Dark"))
-        
+
         self.actionOpen_Tokens_File = QtWidgets.QAction(MainWindow)
         self.actionOpen_Tokens_File.setObjectName("actionOpen_Tokens_File")
-        self.actionOpen_Tokens_File.triggered.connect(lambda: self.Open_Tokens())
+        self.actionOpen_Tokens_File.triggered.connect(
+            lambda: self.Open_Tokens())
         self.menuOpen.addAction(self.actionOpen_Tokens_File)
         self.menuOpen.addAction(self.actionOpen_Snippet_File)
         self.menuOpen.addSeparator()
@@ -229,7 +286,6 @@ class Ui_MainWindow(object):
         self.actionClose.setText(_translate("MainWindow", "Close"))
         self.actionLight.setText(_translate("MainWindow", "Light"))
         self.actionDark.setText(_translate("MainWindow", "Dark"))
-
 
         self.actionOpen_Tokens_File.setText(
             _translate("MainWindow", "Open Tokens File"))
