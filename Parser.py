@@ -21,11 +21,12 @@ class Node:
 "Sub_Token: " {str(self.sub_token)}"""
         # print("sibling: " + str(self.sibling))
 
+
 class Tokens:
     def __init__(self, tokens):
         self.tokens = tokens
 
-    def setChild(self, tokens):
+    def setTokens(self, tokens):
         self.tokens = tokens
         # self.index = self.index + 1
 
@@ -59,37 +60,41 @@ reservedWords = ["if", "then", "else", "end",
 
 # tokenType = ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "IDENTIFIER", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET", "NUMBER"]
 # tokenValue = [';','if','then', 'end', 'repeat', 'until' , ':=', 'read', 'write', '<','=', '+', '-','*', '/', '(', ')']
-token = [('read', "read"), ('x', "identifier"), (';', "SEMICOLON"), ('if', "if"), ('(', "OPENBRACKET"), ('0', "number"), ('<', "LESSTHAN"), ('x', "identifier"), (')', "CLOSEDBRACKET"), ('then', "then"),
-         ('fact', "identifier"), (':=', "assign"), ('result',
-                                                    "identifier"), (';', "SEMICOLON"), ('repeat', "repeat"),
-         ('fact', "identifier"), (':=', "assign"), ('fact',
-                                                    "identifier"), ('*', "mult"), ('x', "identifier"), (';', "SEMICOLON"),
-         ('x', "identifier"), (':=', "assign"), ('x', "identifier"), ('-',
-                                                                      "minus"), ('1', "number"), ('until', "until"),
-         ('x', "identifier"), ('=', "equal"), ('0',
-                                               "number"), (';', "SEMICOLON"), ('write', "write"),
-         ('fact', "identifier"), ('end', "end")]
+# token = [('read', "read"), ('x', "identifier"), (';', "SEMICOLON"), ('if', "if"), ('(', "OPENBRACKET"), ('0', "number"), ('<', "LESSTHAN"), ('x', "identifier"), (')', "CLOSEDBRACKET"), ('then', "then"),
+#          ('fact', "identifier"), (':=', "assign"), ('result',
+#                                                     "identifier"), (';', "SEMICOLON"), ('repeat', "repeat"),
+#          ('fact', "identifier"), (':=', "assign"), ('fact',
+#                                                     "identifier"), ('*', "mult"), ('x', "identifier"), (';', "SEMICOLON"),
+#          ('x', "identifier"), (':=', "assign"), ('x', "identifier"), ('-',
+#                                                                       "minus"), ('1', "number"), ('until', "until"),
+#          ('x', "identifier"), ('=', "equal"), ('0',
+#                                                "number"), (';', "SEMICOLON"), ('write', "write"),
+#          ('fact', "identifier"), ('end', "end")]
+
+# token = [('read', 'READ'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('if', 'IF'), ('0', 'NUMBER'), ('<', 'LESSTHAN'), ('x', 'IDENTIFIER'), ('then', 'THEN'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), (';', 'SEMICOLON'), ('repeat', 'REPEAT'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), ('fact', 'IDENTIFIER'), ('*', 'MULT'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('x', 'IDENTIFIER'), (':=', 'ASSIGN'), ('x', 'IDENTIFIER'), ('-', 'MINUS'), ('1', 'NUMBER'), ('until', 'UNTIL'), ('x', 'IDENTIFIER'), ('=', 'EQUAL'), ('0', 'NUMBER'), (';', 'SEMICOLON'), ('write', 'WRITE'), ('fact', 'IDENTIFIER'), ('end', 'END')] 
+token = []
+tokensInstance = Tokens(token)
 
 
 def match(expectedToken):
     global index
-    token_val, token_type = token[index]
+    token_val, token_type = tokensInstance.tokens[index]
     # passes over ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET"]
     if(token_val == expectedToken):
         index = index + 1
-        return token[index - 1]
+        return tokensInstance.tokens[index - 1]
 
     # IDENTIFIER
     elif((token_val not in reservedWords) and (token_type.lower() == "identifier")):
         index = index + 1
-        return token[index - 1]
+        return tokensInstance.tokens[index - 1]
 
     # NUMBER
     elif(token_type.lower() == "number"):
         try:
             tmp = int(token_val)
             index = index + 1
-            return token[index - 1]
+            return tokensInstance.tokens[index - 1]
 
         except:
             # TODO make an error
@@ -115,20 +120,20 @@ def assignStatement():
 
 def writeStatement():
     # same as print
-    writeNode = Node(token[index])
+    writeNode = Node(tokensInstance.tokens[index])
     match('write')
     writeNode.setChild(exp())
     return writeNode
 
 
 def factor():
-    if(token[index][0] == '('):
+    if(tokensInstance.tokens[index][0] == '('):
         match('(')
         # exp()
         match(')')
-    elif(token[index][1].lower() == 'number'):
+    elif(tokensInstance.tokens[index][1].lower() == 'number'):
         return match('number')
-    elif(token[index][1].lower() == 'identifier'):
+    elif(tokensInstance.tokens[index][1].lower() == 'identifier'):
         return match('identifier')
 
 
@@ -139,8 +144,8 @@ def stmt_sequence():
     rootNode = Node('', '')
     tmpNode = stmt_sequenceNode
 
-    while(token[index][0] == ';'):
-        match(token[index][0])
+    while(tokensInstance.tokens[index][0] == ';'):
+        match(tokensInstance.tokens[index][0])
         sibling = statement()
         tmpNode.setSibling(sibling)
         stmt_sequenceNode = tmpNode
@@ -154,23 +159,23 @@ def stmt_sequence():
 
 def statement():
 
-    resultNode = Node("", "")
-    if(token[index][1].lower() == "identifier"):
+    resultNode = Node('','')
+    if(tokensInstance.tokens[index][1].lower() == "identifier"):
         resultNode = assignStatement()
-    elif(token[index][1].lower() == "if"):
+    elif(tokensInstance.tokens[index][1].lower() == "if"):
         resultNode = ifStatement()
-    elif(token[index][1].lower() == "repeat"):
+    elif(tokensInstance.tokens[index][1].lower() == "repeat"):
         resultNode = repeat()
-    elif(token[index][1].lower() == "read"):
+    elif(tokensInstance.tokens[index][1].lower() == "read"):
         resultNode = readStatement()
-    elif(token[index][1].lower() == "write"):
+    elif(tokensInstance.tokens[index][1].lower() == "write"):
         resultNode = writeStatement()
 
     return resultNode
 
 
 def repeat():
-    repeatNode = Node(token[index])
+    repeatNode = Node(tokensInstance.tokens[index])
     match('repeat')
     child1 = stmt_sequence()
     repeatNode.setChild(child1)
@@ -181,18 +186,18 @@ def repeat():
 
 
 def ifStatement():
-    node = Node(token[index])
+    node = Node(tokensInstance.tokens[index])
     match('if')
-    if token[index][0] == '(':
+    if tokensInstance.tokens[index][0] == '(':
         match('(')
     child1 = exp()
     node.setChild(child1)
-    if token[index][0] == ')':
+    if tokensInstance.tokens[index][0] == ')':
         match(')')
     match('then')
     child2 = stmt_sequence()
     node.setChild(child2)
-    if (token[index][1].lower() == 'else'):
+    if (tokensInstance.tokens[index][1].lower() == 'else'):
         match('else')
         child3 = stmt_sequence()
         node.setChild(child3)
@@ -212,9 +217,9 @@ def readStatement():
 def exp():
     node1 = simpleExp()
     newNode = node1
-    while token[index][0] == '<' or token[index][0] == '=' or token[index][0] == '>':
-        newNode = Node(token[index])
-        match(token[index][0])
+    while tokensInstance.tokens[index][0] == '<' or tokensInstance.tokens[index][0] == '=' or tokensInstance.tokens[index][0] == '>':
+        newNode = Node(tokensInstance.tokens[index])
+        match(tokensInstance.tokens[index][0])
         newNode.setChild(node1)
         node2 = simpleExp()
         newNode.setChild(node2)
@@ -223,9 +228,9 @@ def exp():
 
 def simpleExp():
     tempNode1 = term()
-    while token[index][0] == '+' or token[index][0] == '-':
-        newTemp = Node(token[index])
-        match(token[index][0])
+    while tokensInstance.tokens[index][0] == '+' or tokensInstance.tokens[index][0] == '-':
+        newTemp = Node(tokensInstance.tokens[index])
+        match(tokensInstance.tokens[index][0])
         newTemp.setChild(tempNode1)
         tempNode2 = term()
         newTemp.setChild(tempNode2)
@@ -235,9 +240,9 @@ def simpleExp():
 
 def term():
     tempNode1 = factor()
-    while token[index][0] == '*':
-        newTemp = Node(token[index])
-        match(token[index][0])
+    while tokensInstance.tokens[index][0] == '*':
+        newTemp = Node(tokensInstance.tokens[index])
+        match(tokensInstance.tokens[index][0])
         newTemp.setChild(tempNode1)
         tempNode2 = factor()
         newTemp.setChild(tempNode2)
@@ -245,15 +250,17 @@ def term():
     return tempNode1
 
 
-def Run(tokens):
-    tokens = tokens
+def Run(token_tuples):
+    tokensInstance.setTokens(token_tuples)
     mynode = stmt_sequence()
     Show(mynode)
-    
-
-def main():
-    tokens = [("lol","read")]
-    Run(tokens)
+    return mynode
 
 
-main()
+# Run(token)
+# def main():
+#     # newtokens = [("lol","read")]
+#     # Run(tokensInstance.tokens)
+#     return
+
+# main()

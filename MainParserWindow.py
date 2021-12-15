@@ -75,20 +75,17 @@ class Ui_MainWindow(object):
         if not fileName:
             return
 
-            
         data = self.Bring_Data_From_File(fileName)
-        
 
         self.Token_TextBox.setPlainText(data)
         # print(self.token_tuples)
 
     def Scan_Snippet(self):
         # TODO apply Scanning Algorithm
-        self.snippet = self.Snippet_TextBox.toPlainText() 
+        self.snippet = self.Snippet_TextBox.toPlainText()
         if self.snippet == '':
             self.ErrorDialog("No Snippet Code To Scan!")
             return
-
 
         data = self.Token_TextBox.toPlainText()
         self.Highlight_Text(len(data)-1, 0, self.Token_TextBox)
@@ -97,24 +94,35 @@ class Ui_MainWindow(object):
 
     def Parse_Tokens(self):
         # TODO apply Parsing Algorithm
-        token_data = self.Token_TextBox.toPlainText() 
+        token_data = self.Token_TextBox.toPlainText()
         if token_data == '':
             self.ErrorDialog("No Tokens To Parse!")
             return
 
-        
         extracted = token_data.split('\n')
+        # print(extracted)
         tokens = []
         for element in extracted:
-            token = tuple(element.split(','))
-            if('' in token or len(token) != 2):
+            data = element.split(',')
+            if len(data) != 2:
+                self.ErrorDialog("Incorrect Tokens")
+                return
+            
+            # print(data)
+            token_val = data[0].strip()
+            token_type = data[1].strip()
+            
+            token = (token_val,token_type)
+            # print(token)
+            if('' in token):
                 self.ErrorDialog("Incorrect Tokens")
                 return
             tokens.append(token)
-        
+
         self.token_tuples = tokens
-        for i in self.token_tuples:
-            print(i)
+        
+        Parser.index = 0
+        resultNode = Parser.Run(self.token_tuples)
         self.StatusBar_Message('green', "Syntax Tree Generated")
         return
 
