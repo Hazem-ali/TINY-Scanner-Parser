@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 import Parser
-
+import Scanner
 
 
 class Ui_MainWindow(object):
@@ -19,7 +19,7 @@ class Ui_MainWindow(object):
     def __init__(self):
         self.theme_color = 'Dark'
         self.snippet = ''  # TINY Snippet Code
-        self.token_tuples = []  # List of tupeles
+        self.token_tuples = []  # List of tuples
 
     def GUI_Color(self, theme_color):
         self.theme_color = theme_color
@@ -32,7 +32,15 @@ class Ui_MainWindow(object):
             self.statusBar.setStyleSheet("color : " + color)
         elif self.theme_color == 'Dark':
             self.statusBar.setStyleSheet("color : cyan")
-        self.statusBar.showMessage(message, 4000)
+        self.statusBar.showMessage(message, 9000)
+
+    def Dialog(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText('Success' + ' '*60)
+        msg.setInformativeText(message)
+        msg.setWindowTitle("Success")
+        msg.exec_()
 
     def ErrorDialog(self, error_message):
         msg = QtWidgets.QMessageBox()
@@ -58,7 +66,6 @@ class Ui_MainWindow(object):
             return f.read()
             # self.retrieved_xml = data
             # textbox.setPlainText(data)
-
 
     def Fill_TextBox(self, fileName, textBox):
         data = self.Bring_Data_From_File(fileName)
@@ -129,7 +136,7 @@ class Ui_MainWindow(object):
         # Parser.Show(resultNode)
         # Parser.MakeTree(resultNode)
         # print("---------------------------------------------")
-        Parser.nodeNumber=1
+        Parser.nodeNumber = 1
         print(Parser.MakeTree(resultNode))
         self.StatusBar_Message('green', "Syntax Tree Generated")
         return

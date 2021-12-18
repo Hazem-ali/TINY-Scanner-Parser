@@ -54,17 +54,30 @@ def Show(root: Node):
         Show(root.sibling)
     return
 
-# TODO {1 : ( [(1,2), (1,3), (1,4)] , LEVEL, LABEL_NAME)}
+
+# TODO {1 : ( [(1,2), (1,3), (1,4)] , LEVEL, LABEL_NAME, BOOLEAN)}
+
 
 nodeNumber = 0
+
+# TODO make minus and equal presentation and true/false in dict
+def createLabel(mainToken, sub_token):
+    # prepare the label for the node
+    if sub_token == "":
+        return mainToken[1]
+    else:
+        return mainToken[1] + " (" + sub_token[0] + ")"
+
+
 def MakeTree(root: Node, treeDict={}, level=0):
     global nodeNumber
+    currentNode = nodeNumber
     if type(root) == type(tuple()):
         newNumber = nodeNumber + 1
-        treeDict[nodeNumber] = ([], level, str(root))
+        treeDict[currentNode] = ([], level, root[1] + " (" + root[0] + ")")
         # newLevel = level + 1
         # treeDict[nodeNumber][0].append((nodeNumber, newNumber))
-        nodeNumber += 1
+        # nodeNumber += 1
         return treeDict
     # if root.sibling is None and root.children == []:
 
@@ -74,41 +87,89 @@ def MakeTree(root: Node, treeDict={}, level=0):
     #     return treeDict
 
     # print(root)
-    treeDict[nodeNumber] = ([], level, str(root.token) +
-                        ": " + str(root.sub_token))
 
-    if root.sibling:
-        newNumber = nodeNumber + 1
-        
-        treeDict[nodeNumber][0].append((nodeNumber, newNumber))
-
-        nodeNumber += 1
-        MakeTree(root.sibling, treeDict,level)
+    treeDict[currentNode] = (
+        [], level, createLabel(root.token, root.sub_token))
 
     if root.children != []:
         # global newNumber
-        # newNumber = None 
+        # newNumber = None
         for node in root.children:
 
             newNumber = nodeNumber + 1
             newLevel = level + 1
-            treeDict[nodeNumber][0].append((nodeNumber, newNumber))
-
             nodeNumber += 1
             MakeTree(node, treeDict, newLevel)
+            treeDict[currentNode][0].append((currentNode, newNumber))
+
             # if type(node) == Node:
             #     return MakeTree(node, treeDict, newNumber, newLevel)
             # else:
             #     return MakeTree(node, treeDict, newNumber, newLevel)
             #     print(node)
+
+    if root.sibling:
+        newNumber = nodeNumber + 1
+
+        nodeNumber += 1
+        MakeTree(root.sibling, treeDict, level)
+        treeDict[currentNode][0].append((currentNode, newNumber))
     return treeDict
+
 
 index = 0
 token = []
 specialChars = ['(', ')', '+', '-', '*', '/', '=', ';', '<', '>', '<=', '>=']
+specialCharsTuple = [('(', "OPENBRACKET"), (')', "CLOSEDBRACKET"), ('+', "PLUS"), ('-', "MINUS"), ('*', "MULT"), ('/', "DIV"),
+                     ('=', "EQUAL"), (';', "SEMICOLON"), ('<', "LESSTHAN"), ('>', "GREATERTHAN"), ('<=', "LESSTHANOREQUAL"), ('<=', "GREATERTHANOREQUAL")]
 reservedWords = ["if", "then", "else", "end",
                  "repeat", "until", "read", "write"]
+reservedWordsTuple = [("if", "IF"), ("then", "THEN"), ("else", "ELSE"), ("end", "END"),
+                      ("repeat", "REPEAT"), ("until", "UNTIL"), ("read", "READ"), ("write", "WRITE")]
 tokensInstance = Tokens(token)
+sample = {1: ([(1, 2)], 0, "('read', 'READ'): ('x', 'IDENTIFIER')"),
+          2: ([(2, 3), (2, 6)], 0, "('if', 'IF'): "),
+          3: ([(3, 4), (3, 5)], 1, "('<', 'LESSTHAN'): "),
+          4: ([], 2, "('0', 'NUMBER')"),
+          5: ([], 2, "('x', 'IDENTIFIER')"),
+          6: ([(6, 7), (6, 8)], 1, "(':=', 'ASSIGN'): ('fact', 'IDENTIFIER')"),
+          7: ([], 2, "('1', 'number')"),
+          8: ([(8, 9), (8, 17), (8, 20)], 1, "('repeat', 'REPEAT'): "),
+          9: ([(9, 10), (9, 13)], 2, "(':=', 'ASSIGN'): ('fact', 'IDENTIFIER')"),
+          10: ([(10, 11), (10, 12)], 3, "('*', 'MULT'): "),
+          11: ([], 4, "('fact', 'IDENTIFIER')"),
+          12: ([], 4, "('x', 'IDENTIFIER')"),
+          13: ([(13, 14)], 2, "(':=', 'ASSIGN'): ('x', 'IDENTIFIER')"),
+          14: ([(14, 15), (14, 16)], 3, "('-', 'MINUS'): "),
+          15: ([], 4, "('x', 'IDENTIFIER')"),
+          16: ([], 4, "('1', 'NUMBER')"),
+          17: ([(17, 18), (17, 19)], 2, "('=', 'EQUAL'): "),
+          18: ([], 3, "('x', 'IDENTIFIER')"),
+          19: ([], 3, "('0', 'NUMBER')"),
+          20: ([(20, 21)], 1, "('write', 'WRITE'): "),
+          21: ([], 2, "('fact', 'IDENTIFIER')")}
+
+sample2 = {1: ([(1, 2)], 0, 'READ (x)')
+, 2: ([(2, 3), (2, 6)], 0, 'IF'),
+ 3: ([(3, 4), (3, 5)], 1, 'LESSTHAN'),
+  4: ([], 2, 'NUMBER (0)'), 
+  5: ([], 2, 'IDENTIFIER (x)'), 
+  6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)'), 
+  7: ([], 2, 'number (1)'), 
+  8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT'), 
+  9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)'), 
+  10: ([(10, 11), (10, 12)], 3, 'MULT'), 
+  11: ([], 4, 'IDENTIFIER (fact)'), 
+  12: ([], 4, 'IDENTIFIER (x)'),
+   13: ([(13, 14)], 2, 'ASSIGN (x)'), 
+   14: ([(14, 15), (14, 16)], 3, 'MINUS'), 
+   15: ([], 4, 'IDENTIFIER (x)'),
+    16: ([], 4, 'NUMBER (1)'), 
+    17: ([(17, 18), (17, 19)], 2, 'EQUAL'), 
+    18: ([], 3, 'IDENTIFIER (x)'), 
+    19: ([], 3, 'NUMBER (0)'), 
+    20: ([(20, 21)], 1, 'WRITE'), 
+    21: ([], 2, 'IDENTIFIER (fact)')}
 
 # tokenType = ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "IDENTIFIER", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET", "NUMBER"]
 # tokenValue = [';','if','then', 'end', 'repeat', 'until' , ':=', 'read', 'write', '<','=', '+', '-','*', '/', '(', ')']
@@ -314,4 +375,3 @@ def Run(token_tuples):
 #     return
 
 # main()
-
