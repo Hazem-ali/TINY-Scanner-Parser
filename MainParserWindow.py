@@ -12,10 +12,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 import Parser
 
+
+
 class Ui_MainWindow(object):
 
     def __init__(self):
-        self.theme_color = 'Light'
+        self.theme_color = 'Dark'
         self.snippet = ''  # TINY Snippet Code
         self.token_tuples = []  # List of tupeles
 
@@ -56,6 +58,7 @@ class Ui_MainWindow(object):
             return f.read()
             # self.retrieved_xml = data
             # textbox.setPlainText(data)
+
 
     def Fill_TextBox(self, fileName, textBox):
         data = self.Bring_Data_From_File(fileName)
@@ -107,22 +110,27 @@ class Ui_MainWindow(object):
             if len(data) != 2:
                 self.ErrorDialog("Incorrect Tokens")
                 return
-            
-            # print(data)
+
             token_val = data[0].strip()
             token_type = data[1].strip()
-            
-            token = (token_val,token_type)
-            # print(token)
+
+            token = (token_val, token_type)
+
             if('' in token):
                 self.ErrorDialog("Incorrect Tokens")
                 return
+
             tokens.append(token)
 
         self.token_tuples = tokens
-        
+
         Parser.index = 0
         resultNode = Parser.Run(self.token_tuples)
+        # Parser.Show(resultNode)
+        # Parser.MakeTree(resultNode)
+        # print("---------------------------------------------")
+        Parser.nodeNumber=1
+        print(Parser.MakeTree(resultNode))
         self.StatusBar_Message('green', "Syntax Tree Generated")
         return
 
@@ -321,7 +329,7 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     try:
-        app.setStyleSheet(theme.load_stylesheet(palette=theme.LightPalette))
+        app.setStyleSheet(theme.load_stylesheet(palette=theme.DarkPalette))
     except:
         pass
     sys.exit(app.exec_())

@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class Node:
     def __init__(self, token, sub_token=""):
         self.token = token
@@ -42,6 +45,7 @@ def Show(root: Node):
             if type(node) == Node:
                 Show(node)
             else:
+                # print("LOL")
                 print(node)
     if root.sibling:
         print()
@@ -50,13 +54,61 @@ def Show(root: Node):
         Show(root.sibling)
     return
 
+# TODO {1 : ( [(1,2), (1,3), (1,4)] , LEVEL, LABEL_NAME)}
 
-# nodes = []
-# edges = []
+nodeNumber = 0
+def MakeTree(root: Node, treeDict={}, level=0):
+    global nodeNumber
+    if type(root) == type(tuple()):
+        newNumber = nodeNumber + 1
+        treeDict[nodeNumber] = ([], level, str(root))
+        # newLevel = level + 1
+        # treeDict[nodeNumber][0].append((nodeNumber, newNumber))
+        nodeNumber += 1
+        return treeDict
+    # if root.sibling is None and root.children == []:
+
+    #     newNumber = nodeNumber + 1
+    #     # newLevel = level + 1
+    #     treeDict[nodeNumber][0].append((nodeNumber, newNumber))
+    #     return treeDict
+
+    # print(root)
+    treeDict[nodeNumber] = ([], level, str(root.token) +
+                        ": " + str(root.sub_token))
+
+    if root.sibling:
+        newNumber = nodeNumber + 1
+        
+        treeDict[nodeNumber][0].append((nodeNumber, newNumber))
+
+        nodeNumber += 1
+        MakeTree(root.sibling, treeDict,level)
+
+    if root.children != []:
+        # global newNumber
+        # newNumber = None 
+        for node in root.children:
+
+            newNumber = nodeNumber + 1
+            newLevel = level + 1
+            treeDict[nodeNumber][0].append((nodeNumber, newNumber))
+
+            nodeNumber += 1
+            MakeTree(node, treeDict, newLevel)
+            # if type(node) == Node:
+            #     return MakeTree(node, treeDict, newNumber, newLevel)
+            # else:
+            #     return MakeTree(node, treeDict, newNumber, newLevel)
+            #     print(node)
+    return treeDict
+
 index = 0
+token = []
 specialChars = ['(', ')', '+', '-', '*', '/', '=', ';', '<', '>', '<=', '>=']
 reservedWords = ["if", "then", "else", "end",
                  "repeat", "until", "read", "write"]
+tokensInstance = Tokens(token)
 
 # tokenType = ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "IDENTIFIER", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET", "NUMBER"]
 # tokenValue = [';','if','then', 'end', 'repeat', 'until' , ':=', 'read', 'write', '<','=', '+', '-','*', '/', '(', ')']
@@ -71,9 +123,7 @@ reservedWords = ["if", "then", "else", "end",
 #                                                "number"), (';', "SEMICOLON"), ('write', "write"),
 #          ('fact', "identifier"), ('end', "end")]
 
-# token = [('read', 'READ'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('if', 'IF'), ('0', 'NUMBER'), ('<', 'LESSTHAN'), ('x', 'IDENTIFIER'), ('then', 'THEN'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), (';', 'SEMICOLON'), ('repeat', 'REPEAT'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), ('fact', 'IDENTIFIER'), ('*', 'MULT'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('x', 'IDENTIFIER'), (':=', 'ASSIGN'), ('x', 'IDENTIFIER'), ('-', 'MINUS'), ('1', 'NUMBER'), ('until', 'UNTIL'), ('x', 'IDENTIFIER'), ('=', 'EQUAL'), ('0', 'NUMBER'), (';', 'SEMICOLON'), ('write', 'WRITE'), ('fact', 'IDENTIFIER'), ('end', 'END')] 
-token = []
-tokensInstance = Tokens(token)
+# token = [('read', 'READ'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('if', 'IF'), ('0', 'NUMBER'), ('<', 'LESSTHAN'), ('x', 'IDENTIFIER'), ('then', 'THEN'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), (';', 'SEMICOLON'), ('repeat', 'REPEAT'), ('fact', 'IDENTIFIER'), (':=', 'ASSIGN'), ('fact', 'IDENTIFIER'), ('*', 'MULT'), ('x', 'IDENTIFIER'), (';', 'SEMICOLON'), ('x', 'IDENTIFIER'), (':=', 'ASSIGN'), ('x', 'IDENTIFIER'), ('-', 'MINUS'), ('1', 'NUMBER'), ('until', 'UNTIL'), ('x', 'IDENTIFIER'), ('=', 'EQUAL'), ('0', 'NUMBER'), (';', 'SEMICOLON'), ('write', 'WRITE'), ('fact', 'IDENTIFIER'), ('end', 'END')]
 
 
 def match(expectedToken):
@@ -159,7 +209,7 @@ def stmt_sequence():
 
 def statement():
 
-    resultNode = Node('','')
+    resultNode = Node('', '')
     if(tokensInstance.tokens[index][1].lower() == "identifier"):
         resultNode = assignStatement()
     elif(tokensInstance.tokens[index][1].lower() == "if"):
@@ -253,7 +303,7 @@ def term():
 def Run(token_tuples):
     tokensInstance.setTokens(token_tuples)
     mynode = stmt_sequence()
-    Show(mynode)
+    # Show(mynode)
     return mynode
 
 
@@ -264,3 +314,4 @@ def Run(token_tuples):
 #     return
 
 # main()
+
