@@ -61,12 +61,32 @@ def Show(root: Node):
 nodeNumber = 0
 
 # TODO make minus and equal presentation and true/false in dict
-def createLabel(mainToken, sub_token):
+
+
+def createLabelAndBox(mainToken, sub_token):
+    # TODO circular if identifier or const or operation else square
+    specialCharsTuple = [('(', "OPENBRACKET"), (')', "CLOSEDBRACKET"), ('+', "PLUS"), ('-', "MINUS"), ('*', "MULT"), ('/', "DIV"),
+                         ('=', "EQUAL"), (';', "SEMICOLON"), ('<', "LESSTHAN"), ('>', "GREATERTHAN"), ('<=', "LESSTHANOREQUAL"), ('<=', "GREATERTHANOREQUAL")]
+    label = ''
+    box = 'square'
     # prepare the label for the node
     if sub_token == "":
-        return mainToken[1]
+        if mainToken in specialCharsTuple:
+            # then it's an operation
+            label = mainToken[1] + " (" + mainToken[0] + ")"
+            box = 'circle'
+        else:
+            # Then it's a reserved Word with no sub_token like if, repeat
+            try:
+                label = mainToken[1]
+            except:
+                label = mainToken
+
     else:
-        return mainToken[1] + " (" + sub_token[0] + ")"
+        # Then it's assign or read or write
+        label = mainToken[1] + " (" + sub_token[0] + ")"
+
+    return label, box
 
 
 def MakeTree(root: Node, treeDict={}, level=0):
@@ -74,7 +94,9 @@ def MakeTree(root: Node, treeDict={}, level=0):
     currentNode = nodeNumber
     if type(root) == type(tuple()):
         newNumber = nodeNumber + 1
-        treeDict[currentNode] = ([], level, root[1] + " (" + root[0] + ")")
+        treeDict[currentNode] = (
+            [], level, root[1] + " (" + root[0] + ")", 'circle')
+        # print(root)
         # newLevel = level + 1
         # treeDict[nodeNumber][0].append((nodeNumber, newNumber))
         # nodeNumber += 1
@@ -87,9 +109,8 @@ def MakeTree(root: Node, treeDict={}, level=0):
     #     return treeDict
 
     # print(root)
-
-    treeDict[currentNode] = (
-        [], level, createLabel(root.token, root.sub_token))
+    label, box = createLabelAndBox(root.token, root.sub_token)
+    treeDict[currentNode] = ([], level, label, box)
 
     if root.children != []:
         # global newNumber
@@ -118,58 +139,60 @@ def MakeTree(root: Node, treeDict={}, level=0):
 
 
 index = 0
+error = None
 token = []
 specialChars = ['(', ')', '+', '-', '*', '/', '=', ';', '<', '>', '<=', '>=']
-specialCharsTuple = [('(', "OPENBRACKET"), (')', "CLOSEDBRACKET"), ('+', "PLUS"), ('-', "MINUS"), ('*', "MULT"), ('/', "DIV"),
-                     ('=', "EQUAL"), (';', "SEMICOLON"), ('<', "LESSTHAN"), ('>', "GREATERTHAN"), ('<=', "LESSTHANOREQUAL"), ('<=', "GREATERTHANOREQUAL")]
+
 reservedWords = ["if", "then", "else", "end",
                  "repeat", "until", "read", "write"]
 reservedWordsTuple = [("if", "IF"), ("then", "THEN"), ("else", "ELSE"), ("end", "END"),
                       ("repeat", "REPEAT"), ("until", "UNTIL"), ("read", "READ"), ("write", "WRITE")]
 tokensInstance = Tokens(token)
-sample = {1: ([(1, 2)], 0, "('read', 'READ'): ('x', 'IDENTIFIER')"),
-          2: ([(2, 3), (2, 6)], 0, "('if', 'IF'): "),
-          3: ([(3, 4), (3, 5)], 1, "('<', 'LESSTHAN'): "),
-          4: ([], 2, "('0', 'NUMBER')"),
-          5: ([], 2, "('x', 'IDENTIFIER')"),
-          6: ([(6, 7), (6, 8)], 1, "(':=', 'ASSIGN'): ('fact', 'IDENTIFIER')"),
-          7: ([], 2, "('1', 'number')"),
-          8: ([(8, 9), (8, 17), (8, 20)], 1, "('repeat', 'REPEAT'): "),
-          9: ([(9, 10), (9, 13)], 2, "(':=', 'ASSIGN'): ('fact', 'IDENTIFIER')"),
-          10: ([(10, 11), (10, 12)], 3, "('*', 'MULT'): "),
-          11: ([], 4, "('fact', 'IDENTIFIER')"),
-          12: ([], 4, "('x', 'IDENTIFIER')"),
-          13: ([(13, 14)], 2, "(':=', 'ASSIGN'): ('x', 'IDENTIFIER')"),
-          14: ([(14, 15), (14, 16)], 3, "('-', 'MINUS'): "),
-          15: ([], 4, "('x', 'IDENTIFIER')"),
-          16: ([], 4, "('1', 'NUMBER')"),
-          17: ([(17, 18), (17, 19)], 2, "('=', 'EQUAL'): "),
-          18: ([], 3, "('x', 'IDENTIFIER')"),
-          19: ([], 3, "('0', 'NUMBER')"),
-          20: ([(20, 21)], 1, "('write', 'WRITE'): "),
-          21: ([], 2, "('fact', 'IDENTIFIER')")}
 
-sample2 = {1: ([(1, 2)], 0, 'READ (x)')
-, 2: ([(2, 3), (2, 6)], 0, 'IF'),
- 3: ([(3, 4), (3, 5)], 1, 'LESSTHAN'),
-  4: ([], 2, 'NUMBER (0)'), 
-  5: ([], 2, 'IDENTIFIER (x)'), 
-  6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)'), 
-  7: ([], 2, 'number (1)'), 
-  8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT'), 
-  9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)'), 
-  10: ([(10, 11), (10, 12)], 3, 'MULT'), 
-  11: ([], 4, 'IDENTIFIER (fact)'), 
-  12: ([], 4, 'IDENTIFIER (x)'),
-   13: ([(13, 14)], 2, 'ASSIGN (x)'), 
-   14: ([(14, 15), (14, 16)], 3, 'MINUS'), 
-   15: ([], 4, 'IDENTIFIER (x)'),
-    16: ([], 4, 'NUMBER (1)'), 
-    17: ([(17, 18), (17, 19)], 2, 'EQUAL'), 
-    18: ([], 3, 'IDENTIFIER (x)'), 
-    19: ([], 3, 'NUMBER (0)'), 
-    20: ([(20, 21)], 1, 'WRITE'), 
-    21: ([], 2, 'IDENTIFIER (fact)')}
+
+sample3 = {1: ([(1, 2)], 0, 'READ (x)'),
+           2: ([(2, 3), (2, 6)], 0, 'IF'),
+           3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)'),
+           4: ([], 2, 'NUMBER (0)'),
+           5: ([], 2, 'IDENTIFIER (x)'),
+           6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)'),
+           7: ([], 2, 'number (1)'),
+           8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT'),
+           9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)'),
+           10: ([(10, 11), (10, 12)], 3, 'MULT (*)'),
+           11: ([], 4, 'IDENTIFIER (fact)'),
+           12: ([], 4, 'IDENTIFIER (x)'),
+           13: ([(13, 14)], 2, 'ASSIGN (x)'),
+           14: ([(14, 15), (14, 16)], 3, 'MINUS (-)'),
+           15: ([], 4, 'IDENTIFIER (x)'),
+           16: ([], 4, 'NUMBER (1)'),
+           17: ([(17, 18), (17, 19)], 2, 'EQUAL (=)'),
+           18: ([], 3, 'IDENTIFIER (x)'),
+           19: ([], 3, 'NUMBER (0)'),
+           20: ([(20, 21)], 1, 'WRITE'),
+           21: ([], 2, 'IDENTIFIER (fact)')}
+
+sample4 = {1: ([(1, 2)], 0, 'READ (x)', 'square'),
+           2: ([(2, 3), (2, 6)], 0, 'IF', 'square'),
+           3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)', 'circle'),
+           4: ([], 2, 'NUMBER (0)', 'circle'),
+           5: ([], 2, 'IDENTIFIER (x)', 'circle'),
+           6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)', 'square'),
+           7: ([], 2, 'number (1)', 'circle'),
+           8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT', 'square'),
+           9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)', 'square'),
+           10: ([(10, 11), (10, 12)], 3, 'MULT (*)', 'circle'),
+           11: ([], 4, 'IDENTIFIER (fact)', 'circle'),
+           12: ([], 4, 'IDENTIFIER (x)', 'circle'),
+           13: ([(13, 14)], 2, 'ASSIGN (x)', 'square'),
+           14: ([(14, 15), (14, 16)], 3, 'MINUS (-)', 'circle'),
+           15: ([], 4, 'IDENTIFIER (x)', 'circle'),
+           16: ([], 4, 'NUMBER (1)', 'circle'),
+           17: ([(17, 18), (17, 19)], 2, 'EQUAL (=)', 'circle'),
+           18: ([], 3, 'IDENTIFIER (x)', 'circle'),
+           19: ([], 3, 'NUMBER (0)', 'circle'),
+           20: ([(20, 21)], 1, 'WRITE', 'square'),
+           21: ([], 2, 'IDENTIFIER (fact)', 'circle')}
 
 # tokenType = ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "IDENTIFIER", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET", "NUMBER"]
 # tokenValue = [';','if','then', 'end', 'repeat', 'until' , ':=', 'read', 'write', '<','=', '+', '-','*', '/', '(', ')']
@@ -189,6 +212,7 @@ sample2 = {1: ([(1, 2)], 0, 'READ (x)')
 
 def match(expectedToken):
     global index
+    global error
     token_val, token_type = tokensInstance.tokens[index]
     # passes over ["SEMICOLON", "IF", "THEN", "END", "REPEAT", "UNTIL", "ASSIGN", "READ", "WRITE", "LESSTHAN", "EQUAL","PLUS", "MINUS", "MULT", "DIV", "OPENBRACKET", "CLOSEDBRACKET"]
     if(token_val == expectedToken):
@@ -211,12 +235,14 @@ def match(expectedToken):
             # TODO make an error
             # error matching
             # EXIT UPPER FUNCTION
-            return "ERROR"
+            error = "Non-Integer Value"
+            return error
     else:
         # TODO make an error
         # error matching
         # EXIT UPPER FUNCTION
-        return "ERROR"
+        error = "Invalid Token Type"
+        return error
 
 
 def assignStatement():

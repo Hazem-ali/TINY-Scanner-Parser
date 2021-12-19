@@ -12,6 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import qdarkstyle as theme
 import Parser
 import Scanner
+import Plotter
+from utilites import ErrorDialog
 
 
 class Ui_MainWindow(object):
@@ -132,12 +134,19 @@ class Ui_MainWindow(object):
         self.token_tuples = tokens
 
         Parser.index = 0
+        Parser.error = None
         resultNode = Parser.Run(self.token_tuples)
+        if Parser.error is not None:
+            # we raise an error then return
+            self.ErrorDialog(Parser.error)
+            return
         # Parser.Show(resultNode)
         # Parser.MakeTree(resultNode)
         # print("---------------------------------------------")
         Parser.nodeNumber = 1
-        print(Parser.MakeTree(resultNode))
+        tree = Parser.MakeTree(resultNode)
+        print(tree)
+        Plotter.MR_Fantastic_tree_plotter_without_root_or_linux(tree)
         self.StatusBar_Message('green', "Syntax Tree Generated")
         return
 
