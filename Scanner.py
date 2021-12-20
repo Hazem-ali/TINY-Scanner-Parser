@@ -2,7 +2,7 @@ import re
 import sys
 import os
 
-
+error = None
 def checkComments(myString, startIndex):
     regular_result = re.search(r'({).*?(})', myString[startIndex:])
     if (regular_result is None):
@@ -47,9 +47,10 @@ def checkError(endIndex):
 
     if endIndex is None:
 
+        error = "Syntax Error"
         print("Error")
-
-        sys.exit()
+        return
+        # sys.exit()
 
     else:
 
@@ -57,12 +58,14 @@ def checkError(endIndex):
 
 
 def writeData(filename, data):
-
+    result = ''
     with open(filename, 'w') as f:
         for tuple in data:
             line = str(tuple[0]) + ' ' + str(tuple[1])
-
-            f.write(line + "\n")
+            line += "\n"
+            result += line
+            f.write(line)
+    return result
 
 
 def readData(filename):
@@ -188,11 +191,13 @@ def Scan(inputCode):
             currentState = "start"
     return tokens
 # f = open("outputFile.txt", "w")
-# f.write('\n'.join(tokens))
+# f.write('\n'.join(Scan(readData('snippet.txt'))))
 # f.close()
 
 # print(tokens, file = open('outputFile.txt'))
 # tokens = Scan(readData('snippet.txt'))
+# print("tokens in scanner")
+# print(tokens)
 # writeData('outputTokenFile.txt', tokens)
 # print('File Scanned')
 # os.system("pause")

@@ -54,7 +54,8 @@ def Show(root: Node):
 
 
 
-nodeNumber = 0
+nodeNumber = 1
+error = None
 
 
 
@@ -88,7 +89,6 @@ def createLabelAndBox(mainToken, sub_token):
 def MakeTree(root: Node, treeDict={}, level=0):
     global nodeNumber
     currentNode = nodeNumber
-
     # Base Case
     if type(root) == type(tuple()):
         newNumber = nodeNumber + 1
@@ -98,8 +98,13 @@ def MakeTree(root: Node, treeDict={}, level=0):
     
 
     # Creating a label and box for incoming token  
+    print(root)
+    if root is None:
+        error = "Wrong Syntax"
+        return
     label, box = createLabelAndBox(root.token, root.sub_token)
-    treeDict[currentNode] = ([], level, label, box)
+    if label !='':
+        treeDict[currentNode] = ([], level, label, box)
 
     # Starting from children
     if root.children != []:
@@ -123,7 +128,6 @@ def MakeTree(root: Node, treeDict={}, level=0):
 
 
 index = 0
-error = None
 token = []
 specialChars = ['(', ')', '+', '-', '*', '/', '=', ';', '<', '>', '<=', '>=']
 
@@ -241,18 +245,20 @@ def stmt_sequence():
     stmt_sequenceNode = statement()
     # statement()
     i = 0
-    rootNode = Node('', '')
+    rootNode = stmt_sequenceNode
     tmpNode = stmt_sequenceNode
-
-    while(tokensInstance.tokens[index][0] == ';'):
-        match(tokensInstance.tokens[index][0])
-        sibling = statement()
-        tmpNode.setSibling(sibling)
-        stmt_sequenceNode = tmpNode
-        tmpNode = sibling
-        if i == 0:
-            rootNode = stmt_sequenceNode
-            i = i + 1
+    try:
+        while(tokensInstance.tokens[index][0] == ';'):
+            match(tokensInstance.tokens[index][0])
+            sibling = statement()
+            tmpNode.setSibling(sibling)
+            stmt_sequenceNode = tmpNode
+            tmpNode = sibling
+            if i == 0:
+                rootNode = stmt_sequenceNode
+                i = i + 1
+    except:
+        pass
 
     return rootNode
 
@@ -301,6 +307,7 @@ def ifStatement():
         match('else')
         child3 = stmt_sequence()
         node.setChild(child3)
+    match("end")
     return node
 
 
@@ -317,36 +324,49 @@ def readStatement():
 def exp():
     node1 = simpleExp()
     newNode = node1
-    while tokensInstance.tokens[index][0] == '<' or tokensInstance.tokens[index][0] == '=' or tokensInstance.tokens[index][0] == '>':
-        newNode = Node(tokensInstance.tokens[index])
-        match(tokensInstance.tokens[index][0])
-        newNode.setChild(node1)
-        node2 = simpleExp()
-        newNode.setChild(node2)
+    try:
+        while tokensInstance.tokens[index][0] == '<' or tokensInstance.tokens[index][0] == '=' or tokensInstance.tokens[index][0] == '>':
+            newNode = Node(tokensInstance.tokens[index])
+            match(tokensInstance.tokens[index][0])
+            newNode.setChild(node1)
+            node2 = simpleExp()
+            newNode.setChild(node2)
+    except:
+        pass
     return newNode
 
 
 def simpleExp():
     tempNode1 = term()
-    while tokensInstance.tokens[index][0] == '+' or tokensInstance.tokens[index][0] == '-':
-        newTemp = Node(tokensInstance.tokens[index])
-        match(tokensInstance.tokens[index][0])
-        newTemp.setChild(tempNode1)
-        tempNode2 = term()
-        newTemp.setChild(tempNode2)
-        tempNode1 = newTemp
+
+    try:
+        while tokensInstance.tokens[index][0] == '+' or tokensInstance.tokens[index][0] == '-':
+            newTemp = Node(tokensInstance.tokens[index])
+            match(tokensInstance.tokens[index][0])
+            newTemp.setChild(tempNode1)
+            tempNode2 = term()
+            newTemp.setChild(tempNode2)
+            tempNode1 = newTemp
+    except:
+        pass
+    
+    
     return tempNode1
 
 
 def term():
     tempNode1 = factor()
-    while tokensInstance.tokens[index][0] == '*':
-        newTemp = Node(tokensInstance.tokens[index])
-        match(tokensInstance.tokens[index][0])
-        newTemp.setChild(tempNode1)
-        tempNode2 = factor()
-        newTemp.setChild(tempNode2)
-        tempNode1 = newTemp
+
+    try:
+        while tokensInstance.tokens[index][0] == '*':
+            newTemp = Node(tokensInstance.tokens[index])
+            match(tokensInstance.tokens[index][0])
+            newTemp.setChild(tempNode1)
+            tempNode2 = factor()
+            newTemp.setChild(tempNode2)
+            tempNode1 = newTemp
+    except:
+        pass
     return tempNode1
 
 

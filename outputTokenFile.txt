@@ -1,31 +1,32 @@
-read Reserved Word
-x identifier
-; special symbol
-if Reserved Word
-0 number
-< special symbol
-x identifier
-then Reserved Word
-fact identifier
-:= assign
-1 number
-; special symbol
-repeat Reserved Word
-fact identifier
-:= assign
-fact identifier
-* special symbol
-x identifier
-x identifier
-:= assign
-x identifier
-- special symbol
-1 number
-until Reserved Word
-x identifier
-= special symbol
-0 number
-; special symbol
-write Reserved Word
-fact identifier
-end Reserved Word
+read ,READ
+x ,IDENTIFIER
+; ,SEMICOLON
+if ,IF
+0 ,NUMBER
+< ,LESSTHAN
+x ,IDENTIFIER
+then ,THEN
+fact ,IDENTIFIER
+:= ,ASSIGN
+1 ,NUMBER
+; ,SEMICOLON
+repeat ,REPEAT
+fact ,IDENTIFIER
+:= ,ASSIGN
+fact ,IDENTIFIER
+* ,MULT
+x ,IDENTIFIER
+; ,SEMICOLON
+x ,IDENTIFIER
+:= ,ASSIGN
+x ,IDENTIFIER
+- ,MINUS
+1 ,NUMBER
+until ,UNTIL
+x ,IDENTIFIER
+= ,EQUAL
+0 ,NUMBER
+; ,SEMICOLON
+write ,WRITE
+fact ,IDENTIFIER
+end ,END

@@ -13,7 +13,6 @@ import qdarkstyle as theme
 import Parser
 import Scanner
 import Plotter
-from utilites import ErrorDialog
 
 
 class Ui_MainWindow(object):
@@ -80,7 +79,6 @@ class Ui_MainWindow(object):
         if not fileName:
             return
 
-
         data = self.Bring_Data_From_File(fileName)
         self.Snippet_TextBox.setPlainText(data)
 
@@ -103,10 +101,26 @@ class Ui_MainWindow(object):
             return
 
 
+        Scanner.error = None
+        tokens = Scanner.Scan(self.snippet)
+        if Scanner.error is not None:
+            self.ErrorDialog(Scanner.error)
+        # print("tokens")
+        # print(tokens)
+        
+        print("tokens")
+        print(tokens)
+        tokens_string = Scanner.writeData('outputTokenFile.txt', tokens)
+        print("tokens_string")
+        print(tokens_string)
+        print('File Scanned')
 
+        # tokens = Scanner.Scan(self.snippet)
+        # print(tokens)
+        self.Token_TextBox.setPlainText(tokens_string)
 
-        data = self.Token_TextBox.toPlainText()
-        self.Highlight_Text(len(data)-1, 0, self.Token_TextBox)
+        self.Highlight_Text(len(tokens_string)-1, 0, self.Token_TextBox)
+        self.Dialog("Tokens Generated Successfully")
         self.StatusBar_Message('green', "Tokens Generated & Highlighted")
         return
 
@@ -121,6 +135,10 @@ class Ui_MainWindow(object):
         tokens = []
         for element in extracted:
             data = element.split(',')
+            # print("dataaaa")
+            # print(data)
+            if data == ['']:
+                continue
             if len(data) != 2:
                 self.ErrorDialog("Incorrect Tokens")
                 return
@@ -137,7 +155,8 @@ class Ui_MainWindow(object):
             tokens.append(token)
 
         self.token_tuples = tokens
-
+        # print("tokens")
+        # print(tokens)
         # Parsing Data
         Parser.index = 0
         Parser.error = None
@@ -146,11 +165,11 @@ class Ui_MainWindow(object):
             # we raise an error then return
             self.ErrorDialog(Parser.error)
             return
-        
 
         # Creating Tree from root node
         Parser.nodeNumber = 1
-        tree = Parser.MakeTree(resultNode)
+        tree = Parser.MakeTree(resultNode,{})
+        print("tree")
         print(tree)
         Plotter.MR_Fantastic_tree_plotter_without_root_or_linux(tree)
         self.StatusBar_Message('green', "Syntax Tree Generated")
