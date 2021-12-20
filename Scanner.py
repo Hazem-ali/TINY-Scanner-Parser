@@ -92,12 +92,16 @@ def Scan(inputCode):
                     '=', ';', '<', '>', '<=', '>=']
     specialCharsTuple = [('(', "OPENBRACKET"), (')', "CLOSEDBRACKET"), ('+', "PLUS"), ('-', "MINUS"), ('*', "MULT"), ('/', "DIV"),
                          ('=', "EQUAL"), (';', "SEMICOLON"), ('<', "LESSTHAN"), ('>', "GREATERTHAN"), ('<=', "LESSTHANOREQUAL"), ('<=', "GREATERTHANOREQUAL")]
+    specialCharsType = ["OPENBRACKET", "CLOSEDBRACKET", "PLUS", "MINUS", "MULT", "DIV",
+                         "EQUAL", "SEMICOLON", "LESSTHAN","GREATERTHAN", "LESSTHANOREQUAL", "GREATERTHANOREQUAL"]
 
     reservedWords = ["if", "then", "else", "end",
                      "repeat", "until", "read", "write"]
                      
     reservedWordsTuple = [("if", "IF"), ("then", "THEN"), ("else", "ELSE"), ("end", "END"), (
         "repeat", "REPEAT"), ("until", "UNTIL"), ("read", "READ"), ("write", "WRITE")]
+    reservedWordsType = [ "IF",  "THEN",  "ELSE", "END", 
+         "REPEAT",  "UNTIL",  "READ",  "WRITE"]
     previousState = "start"
     currentState = "start"
     startIndex = 0
@@ -160,22 +164,25 @@ def Scan(inputCode):
         if currentState == "done":
             if previousState == "inID":
                 output = inputCode[startIndex:endIndex]
+                index = 0
                 if output in reservedWords:
                     # TODO replace special symbol with tuple data
-                    tokens.append((output, ",Reserved Word"))
+                    index = reservedWords.index(output)
+                    tokens.append((output, "," + reservedWordsType[index]))
                 else:
-                    tokens.append((output, ",identifier"))
+                    tokens.append((output, ",IDENTIFIER"))
             elif previousState == "inNum":
                 output = inputCode[startIndex:endIndex]
-                tokens.append((output, ",number"))
+                tokens.append((output, ",NUMBER"))
             elif previousState == "inAssign":
                 output = inputCode[startIndex: endIndex + 1]
-                tokens.append((output, ",assign"))
+                tokens.append((output, ",ASSIGN"))
             elif previousState == "start":
                 output = inputCode[endIndex]
                 if output in specialChars:
                     # TODO replace special symbol with tuple data
-                    tokens.append((output, ", special symbol"))
+                    index = specialChars.index(output)
+                    tokens.append((output, "," + specialCharsType[index]))
                 else:
                     checkError(None)
             currentState = "start"
