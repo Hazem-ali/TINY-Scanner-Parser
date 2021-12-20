@@ -1,4 +1,3 @@
-from typing import Tuple
 
 
 class Node:
@@ -7,11 +6,10 @@ class Node:
         self.sub_token = sub_token
         self.children = []
         self.sibling = None
-        # self.index = 0
 
     def setChild(self, node):
         self.children.append(node)
-        # self.index = self.index + 1
+
 
     def setSibling(self, sibling):
         self.sibling = sibling
@@ -22,7 +20,7 @@ class Node:
 
         return f""""Token: " {str(self.token)}
 "Sub_Token: " {str(self.sub_token)}"""
-        # print("sibling: " + str(self.sibling))
+
 
 
 class Tokens:
@@ -31,7 +29,7 @@ class Tokens:
 
     def setTokens(self, tokens):
         self.tokens = tokens
-        # self.index = self.index + 1
+
 
 
 def Show(root: Node):
@@ -45,26 +43,24 @@ def Show(root: Node):
             if type(node) == Node:
                 Show(node)
             else:
-                # print("LOL")
                 print(node)
     if root.sibling:
         print()
         print("---- Sibling of " + str(root.token) + " ----")
-        # print(root.sibling)
         Show(root.sibling)
     return
 
 
-# TODO {1 : ( [(1,2), (1,3), (1,4)] , LEVEL, LABEL_NAME, BOOLEAN)}
+
 
 
 nodeNumber = 0
 
-# TODO make minus and equal presentation and true/false in dict
+
 
 
 def createLabelAndBox(mainToken, sub_token):
-    # TODO circular if identifier or const or operation else square
+
     specialCharsTuple = [('(', "OPENBRACKET"), (')', "CLOSEDBRACKET"), ('+', "PLUS"), ('-', "MINUS"), ('*', "MULT"), ('/', "DIV"),
                          ('=', "EQUAL"), (';', "SEMICOLON"), ('<', "LESSTHAN"), ('>', "GREATERTHAN"), ('<=', "LESSTHANOREQUAL"), ('<=', "GREATERTHANOREQUAL")]
     label = ''
@@ -92,29 +88,21 @@ def createLabelAndBox(mainToken, sub_token):
 def MakeTree(root: Node, treeDict={}, level=0):
     global nodeNumber
     currentNode = nodeNumber
+
+    # Base Case
     if type(root) == type(tuple()):
         newNumber = nodeNumber + 1
         treeDict[currentNode] = (
             [], level, root[1] + " (" + root[0] + ")", 'circle')
-        # print(root)
-        # newLevel = level + 1
-        # treeDict[nodeNumber][0].append((nodeNumber, newNumber))
-        # nodeNumber += 1
         return treeDict
-    # if root.sibling is None and root.children == []:
+    
 
-    #     newNumber = nodeNumber + 1
-    #     # newLevel = level + 1
-    #     treeDict[nodeNumber][0].append((nodeNumber, newNumber))
-    #     return treeDict
-
-    # print(root)
+    # Creating a label and box for incoming token  
     label, box = createLabelAndBox(root.token, root.sub_token)
     treeDict[currentNode] = ([], level, label, box)
 
+    # Starting from children
     if root.children != []:
-        # global newNumber
-        # newNumber = None
         for node in root.children:
 
             newNumber = nodeNumber + 1
@@ -123,18 +111,14 @@ def MakeTree(root: Node, treeDict={}, level=0):
             MakeTree(node, treeDict, newLevel)
             treeDict[currentNode][0].append((currentNode, newNumber))
 
-            # if type(node) == Node:
-            #     return MakeTree(node, treeDict, newNumber, newLevel)
-            # else:
-            #     return MakeTree(node, treeDict, newNumber, newLevel)
-            #     print(node)
-
+    # Going to siblings
     if root.sibling:
         newNumber = nodeNumber + 1
 
         nodeNumber += 1
         MakeTree(root.sibling, treeDict, level)
         treeDict[currentNode][0].append((currentNode, newNumber))
+
     return treeDict
 
 
@@ -150,29 +134,8 @@ reservedWordsTuple = [("if", "IF"), ("then", "THEN"), ("else", "ELSE"), ("end", 
 tokensInstance = Tokens(token)
 
 
-sample3 = {1: ([(1, 2)], 0, 'READ (x)'),
-           2: ([(2, 3), (2, 6)], 0, 'IF'),
-           3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)'),
-           4: ([], 2, 'NUMBER (0)'),
-           5: ([], 2, 'IDENTIFIER (x)'),
-           6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)'),
-           7: ([], 2, 'number (1)'),
-           8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT'),
-           9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)'),
-           10: ([(10, 11), (10, 12)], 3, 'MULT (*)'),
-           11: ([], 4, 'IDENTIFIER (fact)'),
-           12: ([], 4, 'IDENTIFIER (x)'),
-           13: ([(13, 14)], 2, 'ASSIGN (x)'),
-           14: ([(14, 15), (14, 16)], 3, 'MINUS (-)'),
-           15: ([], 4, 'IDENTIFIER (x)'),
-           16: ([], 4, 'NUMBER (1)'),
-           17: ([(17, 18), (17, 19)], 2, 'EQUAL (=)'),
-           18: ([], 3, 'IDENTIFIER (x)'),
-           19: ([], 3, 'NUMBER (0)'),
-           20: ([(20, 21)], 1, 'WRITE'),
-           21: ([], 2, 'IDENTIFIER (fact)')}
 
-sample4 = {1: ([(1, 2)], 0, 'READ (x)', 'square'),
+sample = {1: ([(1, 2)], 0, 'READ (x)', 'square'),
            2: ([(2, 3), (2, 6)], 0, 'IF', 'square'),
            3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)', 'circle'),
            4: ([], 2, 'NUMBER (0)', 'circle'),

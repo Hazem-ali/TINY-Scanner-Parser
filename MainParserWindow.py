@@ -75,14 +75,18 @@ class Ui_MainWindow(object):
 
     def Open_Snippet(self):
         fileName = self.OpenFile()
+
         # make sure it is valid file
         if not fileName:
             return
+
+
         data = self.Bring_Data_From_File(fileName)
         self.Snippet_TextBox.setPlainText(data)
 
     def Open_Tokens(self):
         fileName = self.OpenFile()
+
         # make sure it is valid file
         if not fileName:
             return
@@ -90,7 +94,6 @@ class Ui_MainWindow(object):
         data = self.Bring_Data_From_File(fileName)
 
         self.Token_TextBox.setPlainText(data)
-        # print(self.token_tuples)
 
     def Scan_Snippet(self):
         # TODO apply Scanning Algorithm
@@ -99,13 +102,15 @@ class Ui_MainWindow(object):
             self.ErrorDialog("No Snippet Code To Scan!")
             return
 
+
+
+
         data = self.Token_TextBox.toPlainText()
         self.Highlight_Text(len(data)-1, 0, self.Token_TextBox)
         self.StatusBar_Message('green', "Tokens Generated & Highlighted")
         return
 
     def Parse_Tokens(self):
-        # TODO apply Parsing Algorithm
         token_data = self.Token_TextBox.toPlainText()
         if token_data == '':
             self.ErrorDialog("No Tokens To Parse!")
@@ -133,6 +138,7 @@ class Ui_MainWindow(object):
 
         self.token_tuples = tokens
 
+        # Parsing Data
         Parser.index = 0
         Parser.error = None
         resultNode = Parser.Run(self.token_tuples)
@@ -140,9 +146,9 @@ class Ui_MainWindow(object):
             # we raise an error then return
             self.ErrorDialog(Parser.error)
             return
-        # Parser.Show(resultNode)
-        # Parser.MakeTree(resultNode)
-        # print("---------------------------------------------")
+        
+
+        # Creating Tree from root node
         Parser.nodeNumber = 1
         tree = Parser.MakeTree(resultNode)
         print(tree)
@@ -300,7 +306,7 @@ class Ui_MainWindow(object):
         self.Snippet_TextBox.setPlaceholderText(
             _translate("MainWindow", "TINY Snippet Code..."))
         self.Load_Snippet_Button.setText(
-            _translate("MainWindow", "Load Snippet"))
+            _translate("MainWindow", "Load Code"))
         self.Token_TextBox.setPlaceholderText(
             _translate("MainWindow", "Tokenvalue, Tokentype"))
         self.Scan_Tiny_Button.setText(
@@ -313,7 +319,7 @@ class Ui_MainWindow(object):
         self.menuOpen.setTitle(_translate("MainWindow", "File"))
         self.menuTheme.setTitle(_translate("MainWindow", "Theme"))
         self.actionOpen_Snippet_File.setText(
-            _translate("MainWindow", "Open Snippet File"))
+            _translate("MainWindow", "Open Code File"))
         self.actionSave_As.setText(_translate("MainWindow", "Save As"))
         self.actionClose.setText(_translate("MainWindow", "Close"))
         self.actionLight.setText(_translate("MainWindow", "Light"))
