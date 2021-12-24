@@ -233,8 +233,9 @@ def writeStatement():
 def factor():
     if(tokensInstance.tokens[index][0] == '('):
         match('(')
-        # exp()
+        node = exp()
         match(')')
+        return node
     elif(tokensInstance.tokens[index][1].lower() == 'number'):
         return match('number')
     elif(tokensInstance.tokens[index][1].lower() == 'identifier'):
@@ -276,6 +277,8 @@ def statement():
         resultNode = readStatement()
     elif(tokensInstance.tokens[index][1].lower() == "write"):
         resultNode = writeStatement()
+    else:
+        error = "Invalid Tokens"
 
     return resultNode
 
@@ -358,7 +361,7 @@ def term():
     tempNode1 = factor()
 
     try:
-        while tokensInstance.tokens[index][0] == '*':
+        while tokensInstance.tokens[index][0] == '*' or tokensInstance.tokens[index][0] == '/':
             newTemp = Node(tokensInstance.tokens[index])
             match(tokensInstance.tokens[index][0])
             newTemp.setChild(tempNode1)

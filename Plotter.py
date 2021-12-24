@@ -6,27 +6,27 @@ import numpy as np
 
 # tree node : ( list of edges to its children , level , label_name  )
 # tree key node is sorted by level-traversal
-tree = sample4 = {1: ([(1, 2)], 0, 'READ (x)', 'square'),
-                  2: ([(2, 3), (2, 6)], 0, 'IF', 'square'),
-                  3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)', 'circle'),
-                  4: ([], 2, 'NUMBER (0)', 'circle'),
-                  5: ([], 2, 'IDENTIFIER (x)', 'circle'),
-                  6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)', 'square'),
-                  7: ([], 2, 'number (1)', 'circle'),
-                  8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT', 'square'),
-                  9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)', 'square'),
-                  10: ([(10, 11), (10, 12)], 3, 'MULT (*)', 'circle'),
-                  11: ([], 4, 'IDENTIFIER (fact)', 'circle'),
-                  12: ([], 4, 'IDENTIFIER (x)', 'circle'),
-                  13: ([(13, 14)], 2, 'ASSIGN (x)', 'square'),
-                  14: ([(14, 15), (14, 16)], 3, 'MINUS (-)', 'circle'),
-                  15: ([], 4, 'IDENTIFIER (x)', 'circle'),
-                  16: ([], 4, 'NUMBER (1)', 'circle'),
-                  17: ([(17, 18), (17, 19)], 2, 'EQUAL (=)', 'circle'),
-                  18: ([], 3, 'IDENTIFIER (x)', 'circle'),
-                  19: ([], 3, 'NUMBER (0)', 'circle'),
-                  20: ([(20, 21)], 1, 'WRITE', 'square'),
-                  21: ([], 2, 'IDENTIFIER (fact)', 'circle')}
+# tree = sample4 = {1: ([(1, 2)], 0, 'READ (x)', 'square'),
+#                   2: ([(2, 3), (2, 6)], 0, 'IF', 'square'),
+#                   3: ([(3, 4), (3, 5)], 1, 'LESSTHAN (<)', 'circle'),
+#                   4: ([], 2, 'NUMBER (0)', 'circle'),
+#                   5: ([], 2, 'IDENTIFIER (x)', 'circle'),
+#                   6: ([(6, 7), (6, 8)], 1, 'ASSIGN (fact)', 'square'),
+#                   7: ([], 2, 'number (1)', 'circle'),
+#                   8: ([(8, 9), (8, 17), (8, 20)], 1, 'REPEAT', 'square'),
+#                   9: ([(9, 10), (9, 13)], 2, 'ASSIGN (fact)', 'square'),
+#                   10: ([(10, 11), (10, 12)], 3, 'MULT (*)', 'circle'),
+#                   11: ([], 4, 'IDENTIFIER (fact)', 'circle'),
+#                   12: ([], 4, 'IDENTIFIER (x)', 'circle'),
+#                   13: ([(13, 14)], 2, 'ASSIGN (x)', 'square'),
+#                   14: ([(14, 15), (14, 16)], 3, 'MINUS (-)', 'circle'),
+#                   15: ([], 4, 'IDENTIFIER (x)', 'circle'),
+#                   16: ([], 4, 'NUMBER (1)', 'circle'),
+#                   17: ([(17, 18), (17, 19)], 2, 'EQUAL (=)', 'circle'),
+#                   18: ([], 3, 'IDENTIFIER (x)', 'circle'),
+#                   19: ([], 3, 'NUMBER (0)', 'circle'),
+#                   20: ([(20, 21)], 1, 'WRITE', 'square'),
+#                   21: ([], 2, 'IDENTIFIER (fact)', 'circle')}
 
 #sq_cr_switch = list([True]*10+[False]*3)
 

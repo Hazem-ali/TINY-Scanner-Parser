@@ -1,6 +1,4 @@
 import re
-import sys
-import os
 
 error = None
 def checkComments(myString, startIndex):

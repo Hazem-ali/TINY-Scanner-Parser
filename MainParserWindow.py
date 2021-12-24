@@ -368,6 +368,7 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.StatusBar_Message('green',"Welcome to TINY Compiler")
     MainWindow.show()
     try:
         app.setStyleSheet(theme.load_stylesheet(palette=theme.DarkPalette))
